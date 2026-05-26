@@ -135,7 +135,7 @@ code {
 
 .flip-card {
   perspective: 1000px;
-  height: 120px;
+  aspect-ratio: 1 / 1;
   cursor: pointer;
 }
 
