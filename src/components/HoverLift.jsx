@@ -15,20 +15,38 @@ export default function HoverLift() {
 
   const onEnter = contextSafe((e) => {
     const card = e.currentTarget
-    gsap.to(card, { y: -14, scale: 1.045, duration: 0.35, ease: 'power3.out' })
+    if (card.classList.contains('is-lifted')) return
+    gsap.to(card, { y: -6, scale: 1.02, duration: 0.3, ease: 'power3.out' })
     gsap.to(card.querySelector('.card__glow'), {
-      opacity: 1,
-      duration: 0.35,
+      opacity: 0.55,
+      duration: 0.3,
       ease: 'power3.out',
     })
   })
 
   const onLeave = contextSafe((e) => {
     const card = e.currentTarget
-    gsap.to(card, { y: 0, scale: 1, duration: 0.4, ease: 'power3.out' })
+    if (card.classList.contains('is-lifted')) return
+    gsap.to(card, { y: 0, scale: 1, duration: 0.35, ease: 'power3.out' })
     gsap.to(card.querySelector('.card__glow'), {
       opacity: 0,
-      duration: 0.4,
+      duration: 0.35,
+      ease: 'power3.out',
+    })
+  })
+
+  const onClick = contextSafe((e) => {
+    const card = e.currentTarget
+    const lifted = card.classList.toggle('is-lifted')
+    gsap.to(card, {
+      y: lifted ? -24 : -6,
+      scale: lifted ? 1.07 : 1.02,
+      duration: lifted ? 0.45 : 0.3,
+      ease: lifted ? 'back.out(1.8)' : 'power3.out',
+    })
+    gsap.to(card.querySelector('.card__glow'), {
+      opacity: lifted ? 1 : 0.55,
+      duration: 0.35,
       ease: 'power3.out',
     })
   })
@@ -38,8 +56,8 @@ export default function HoverLift() {
       <header className="panel__head">
         <h2>Hover lift</h2>
         <p>
-          Tweens <code>y</code> &amp; <code>scale</code> on pointer enter/leave through{' '}
-          <code>contextSafe</code> so listeners stay scoped and revertible.
+          A subtle <code>y</code>/<code>scale</code> tween on hover; click to pop the card into a
+          deeper lift (with a <code>back.out</code> ease) that stays pinned until you click again.
         </p>
       </header>
 
@@ -51,11 +69,12 @@ export default function HoverLift() {
             style={{ '--hue': c.hue }}
             onMouseEnter={onEnter}
             onMouseLeave={onLeave}
+            onClick={onClick}
           >
             <span className="card__glow" aria-hidden="true" />
             <span className="card__dot" aria-hidden="true" />
             <h3>{c.title}</h3>
-            <p>hover me</p>
+            <p>hover · click to pin</p>
           </article>
         ))}
       </div>
