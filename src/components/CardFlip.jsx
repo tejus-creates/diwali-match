@@ -26,22 +26,20 @@ export default function CardFlip() {
   const onEnter = contextSafe((e) => {
     gsap.to(e.currentTarget, {
       y: -10,
-      rotation: 2,
+      rotationY: 16,
       scale: 1.03,
-      duration: 0.3,
+      duration: 0.35,
       ease: 'power2.out',
-      force3D: false,
     })
   })
 
   const onLeave = contextSafe((e) => {
     gsap.to(e.currentTarget, {
       y: 0,
-      rotation: 0,
+      rotationY: 0,
       scale: 1,
-      duration: 0.35,
+      duration: 0.4,
       ease: 'power2.out',
-      force3D: false,
     })
   })
 

@@ -131,6 +131,7 @@ code {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  perspective: 1200px;
 }
 
 .flip-card {
