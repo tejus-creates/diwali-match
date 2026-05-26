@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import HoverLift from './components/HoverLift.jsx'
-import FlipDemo from './components/FlipDemo.jsx'
+import CardFlip from './components/CardFlip.jsx'
 
 export default function App() {
   const scope = useRef(null)
@@ -25,7 +25,7 @@ export default function App() {
       <header className="app__head reveal">
         <span className="app__badge">GSAP sandbox</span>
         <h1>diwali-match · animation lab</h1>
-        <p>A scratch space for testing hover-lift tweens and GSAP Flip transitions.</p>
+        <p>A scratch space for testing hover-lift tweens and 3D card flips.</p>
       </header>
 
       <main className="app__main">
@@ -33,7 +33,7 @@ export default function App() {
           <HoverLift />
         </div>
         <div className="reveal">
-          <FlipDemo />
+          <CardFlip />
         </div>
       </main>
     </div>
