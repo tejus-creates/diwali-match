@@ -23,6 +23,28 @@ export default function CardFlip() {
     })
   })
 
+  const onEnter = contextSafe((e) => {
+    gsap.to(e.currentTarget, {
+      y: -10,
+      rotation: 2,
+      scale: 1.03,
+      duration: 0.3,
+      ease: 'power2.out',
+      force3D: false,
+    })
+  })
+
+  const onLeave = contextSafe((e) => {
+    gsap.to(e.currentTarget, {
+      y: 0,
+      rotation: 0,
+      scale: 1,
+      duration: 0.35,
+      ease: 'power2.out',
+      force3D: false,
+    })
+  })
+
   const flipAll = contextSafe(() => {
     const cards = [...scope.current.querySelectorAll('.flip-card')]
     const turnUp = cards.some((c) => !c.classList.contains('is-flipped'))
@@ -55,7 +77,14 @@ export default function CardFlip() {
 
       <div className="flip-deck">
         {CARDS.map((c) => (
-          <div key={c.id} className="flip-card" style={{ '--hue': c.hue }} onClick={flip}>
+          <div
+            key={c.id}
+            className="flip-card"
+            style={{ '--hue': c.hue }}
+            onClick={flip}
+            onMouseEnter={onEnter}
+            onMouseLeave={onLeave}
+          >
             <div className="flip-card__inner">
               <div className="flip-card__face flip-card__cover">
                 <span className="flip-card__mark" aria-hidden="true">
