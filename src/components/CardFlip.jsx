@@ -13,8 +13,25 @@ export default function CardFlip() {
   const scope = useRef(null)
   const { contextSafe } = useGSAP({ scope })
 
-  const hoverLift = { y: -10, rotationY: 45, scale: 1.03, transformPerspective: 900 }
   const grounded = { y: 0, rotationY: 0, scale: 1, transformPerspective: 900 }
+  const MAX_PEEK = 45
+
+  // Peek direction follows the card's spot in the row: left cards turn one way,
+  // right cards the other, easing toward 0 in the middle.
+  const peekAngle = (card) => {
+    const cards = [...card.parentElement.children]
+    const mid = (cards.length - 1) / 2
+    if (mid === 0) return 0
+    const norm = (cards.indexOf(card) - mid) / mid // -1 (left) .. +1 (right)
+    return norm * MAX_PEEK
+  }
+
+  const liftVars = (card) => ({
+    y: -10,
+    rotationY: peekAngle(card),
+    scale: 1.03,
+    transformPerspective: 900,
+  })
 
   const flip = contextSafe((e) => {
     const card = e.currentTarget
@@ -26,7 +43,7 @@ export default function CardFlip() {
     })
     // flipped cards sit flat; an unflipped card stays lifted since the pointer is still on it
     gsap.to(card, {
-      ...(flipped ? grounded : hoverLift),
+      ...(flipped ? grounded : liftVars(card)),
       duration: 0.5,
       ease: 'power2.out',
     })
@@ -34,7 +51,7 @@ export default function CardFlip() {
 
   const onEnter = contextSafe((e) => {
     if (e.currentTarget.classList.contains('is-flipped')) return
-    gsap.to(e.currentTarget, { ...hoverLift, duration: 0.35, ease: 'power2.out' })
+    gsap.to(e.currentTarget, { ...liftVars(e.currentTarget), duration: 0.35, ease: 'power2.out' })
   })
 
   const onLeave = contextSafe((e) => {
