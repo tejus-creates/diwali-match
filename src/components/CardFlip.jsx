@@ -26,7 +26,7 @@ export default function CardFlip() {
   const onEnter = contextSafe((e) => {
     gsap.to(e.currentTarget, {
       y: -10,
-      rotationY: 16,
+      rotationY: 45,
       scale: 1.03,
       duration: 0.35,
       ease: 'power2.out',
