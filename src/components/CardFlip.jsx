@@ -16,15 +16,18 @@ export default function CardFlip() {
   const grounded = { y: 0, rotationY: 0, scale: 1, transformPerspective: 900 }
   const MAX_PEEK = 45
 
-  // Peek direction follows the card's spot in the row: left cards turn one way,
-  // right cards the other, easing toward 0 in the middle.
+  // Each card peeks open from its own outer edge: left cards turn left, right
+  // cards turn right, easing toward 0 in the middle.
   const peekAngle = (card) => {
     const cards = [...card.parentElement.children]
     const mid = (cards.length - 1) / 2
     if (mid === 0) return 0
     const norm = (cards.indexOf(card) - mid) / mid // -1 (left) .. +1 (right)
-    return norm * MAX_PEEK
+    return -norm * MAX_PEEK
   }
+
+  // Flip spins the same rotational direction the card's peek leans.
+  const flipDir = (card) => (peekAngle(card) >= 0 ? 1 : -1)
 
   const liftVars = (card) => ({
     y: -10,
@@ -37,7 +40,7 @@ export default function CardFlip() {
     const card = e.currentTarget
     const flipped = card.classList.toggle('is-flipped')
     gsap.to(card.querySelector('.flip-card__inner'), {
-      rotationY: flipped ? 180 : 0,
+      rotationY: flipped ? 180 * flipDir(card) : 0,
       duration: 0.6,
       ease: 'power2.inOut',
     })
@@ -64,7 +67,7 @@ export default function CardFlip() {
     const turnUp = cards.some((c) => !c.classList.contains('is-flipped'))
     cards.forEach((c) => c.classList.toggle('is-flipped', turnUp))
     gsap.to(scope.current.querySelectorAll('.flip-card__inner'), {
-      rotationY: turnUp ? 180 : 0,
+      rotationY: (i, t) => (turnUp ? 180 * flipDir(t.parentElement) : 0),
       duration: 0.6,
       ease: 'power2.inOut',
       stagger: 0.08,
