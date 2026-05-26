@@ -130,12 +130,12 @@ code {
 .flip-deck {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 14px;
 }
 
 .flip-card {
   perspective: 1000px;
-  height: 156px;
+  height: 120px;
   cursor: pointer;
 }
 

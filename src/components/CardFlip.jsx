@@ -2,39 +2,50 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 
-const CARDS = [
-  { id: 1, title: 'Diya', hue: 32 },
-  { id: 2, title: 'Sweets', hue: 320 },
-  { id: 3, title: 'Rangoli', hue: 168 },
-  { id: 4, title: 'Lantern', hue: 268 },
+const NAMES = [
+  'Diya', 'Sweets', 'Lights', 'Rangoli',
+  'Crackers', 'Gifts', 'Lamp', 'Sparkler',
+  'Lantern', 'Marigold', 'Candle', 'Star',
+  'Garland', 'Bell', 'Peacock', 'Lotus',
 ]
+const CARDS = NAMES.map((title, i) => ({
+  id: i + 1,
+  title,
+  hue: Math.round((i * 360) / NAMES.length),
+}))
 
 export default function CardFlip() {
   const scope = useRef(null)
   const { contextSafe } = useGSAP({ scope })
 
-  const grounded = { y: 0, rotationY: 0, scale: 1, transformPerspective: 900 }
-  const MAX_PEEK = 45
+  const grounded = { y: 0, rotationX: 0, rotationY: 0, scale: 1, transformPerspective: 900 }
+  const MAX_TILT = 45
 
-  // Each card peeks open from its own outer edge: left cards turn left, right
-  // cards turn right, easing toward 0 in the middle.
-  const peekAngle = (card) => {
-    const cards = [...card.parentElement.children]
-    const mid = (cards.length - 1) / 2
-    if (mid === 0) return 0
-    const norm = (cards.indexOf(card) - mid) / mid // -1 (left) .. +1 (right)
-    return -norm * MAX_PEEK
+  // Card position relative to the grid center, each axis normalized to -1..1.
+  const norms = (card) => {
+    const d = card.parentElement.getBoundingClientRect()
+    const c = card.getBoundingClientRect()
+    return {
+      nx: (c.left + c.width / 2 - (d.left + d.width / 2)) / (d.width / 2),
+      ny: (c.top + c.height / 2 - (d.top + d.height / 2)) / (d.height / 2),
+    }
   }
 
-  // Flip spins the same rotational direction the card's peek leans.
-  const flipDir = (card) => (peekAngle(card) >= 0 ? 1 : -1)
+  // Radial peek: each card tilts toward its own corner of the grid (lifting that
+  // corner), fading to a near-flat lift for cards close to the center.
+  const tiltVars = (card) => {
+    const { nx, ny } = norms(card)
+    return {
+      y: -10,
+      rotationX: ny * MAX_TILT,
+      rotationY: -nx * MAX_TILT,
+      scale: 1.03,
+      transformPerspective: 900,
+    }
+  }
 
-  const liftVars = (card) => ({
-    y: -10,
-    rotationY: peekAngle(card),
-    scale: 1.03,
-    transformPerspective: 900,
-  })
+  // Flip spins the same horizontal direction the card's peek leans.
+  const flipDir = (card) => (norms(card).nx <= 0 ? 1 : -1)
 
   const flip = contextSafe((e) => {
     const card = e.currentTarget
@@ -46,7 +57,7 @@ export default function CardFlip() {
     })
     // flipped cards sit flat; an unflipped card stays lifted since the pointer is still on it
     gsap.to(card, {
-      ...(flipped ? grounded : liftVars(card)),
+      ...(flipped ? grounded : tiltVars(card)),
       duration: 0.5,
       ease: 'power2.out',
     })
@@ -54,7 +65,7 @@ export default function CardFlip() {
 
   const onEnter = contextSafe((e) => {
     if (e.currentTarget.classList.contains('is-flipped')) return
-    gsap.to(e.currentTarget, { ...liftVars(e.currentTarget), duration: 0.35, ease: 'power2.out' })
+    gsap.to(e.currentTarget, { ...tiltVars(e.currentTarget), duration: 0.35, ease: 'power2.out' })
   })
 
   const onLeave = contextSafe((e) => {
@@ -80,9 +91,9 @@ export default function CardFlip() {
       <header className="panel__head">
         <h2>Card flip</h2>
         <p>
-          A cover turning over on the Y axis: GSAP tweens <code>rotationY</code> on a{' '}
-          <code>preserve-3d</code> inner whose two faces hide their backfaces. Click a card to
-          flip it.
+          Hover tilts each card toward its corner of the grid (radial from the center), and a
+          click flips the <code>preserve-3d</code> cover over on the Y axis in the same direction
+          it leans.
         </p>
       </header>
 
